@@ -72,6 +72,12 @@
       <artifactId>ashot</artifactId>
       <version>1.5.4</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>6.3.3</version>
+    </dependency>
   </dependencies>
   <build>
     <defaultGoal>clean test</defaultGoal>
