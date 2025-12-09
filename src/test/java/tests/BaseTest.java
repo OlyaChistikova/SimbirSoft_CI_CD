@@ -1,6 +1,7 @@
 package tests;
 
 import helpers.JavaScriptExecutorHelper;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.Step;
 import lombok.Getter;
 import org.openqa.selenium.WebDriver;
@@ -18,8 +19,10 @@ public class BaseTest {
     protected boolean useIncognito = false;
     protected SoftAssert softAssert;
 
+
     @BeforeMethod(description = "Настройка браузера перед запуском тестов")
     public void setUp(){
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
