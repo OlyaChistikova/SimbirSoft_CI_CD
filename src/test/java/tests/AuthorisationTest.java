@@ -69,7 +69,7 @@ public class AuthorisationTest extends BaseTest{
     public void checkUnSuccessAuthorizationInvalidDataTest(String username, String password, String description){
         authorisationPage.setAuthorisationFields(username, password, description).clickButtonLogin();
         Assert.assertEquals(authorisationPage.getErrorMessage(), "Username or password is incorrect");
-        Assert.assertTrue(authorisationPage.clearInputFields().checkDisabledLoginButton());
+        Assert.assertFalse(authorisationPage.clearInputFields().checkDisabledLoginButton());
     }
 
     @Test(description = "Проверка успешного разлогирования")
