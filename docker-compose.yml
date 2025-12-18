@@ -1,0 +1,52 @@
+services:
+  selenoid:
+    image: aerokube/selenoid:1.11.3
+    container_name: selenoid
+    restart: always
+    ports:
+      - "4444:4444"
+    volumes:
+        - "./selenoid:/etc/selenoid:ro,Z"
+        - "./selenoid/video:/opt/selenoid/video:Z"
+        - "./selenoid/logs:/opt/selenoid/logs:Z"
+        - "/var/run/docker.sock:/var/run/docker.sock"
+        - ./selenoid/browser.json:/etc/selenoid/browser.json:ro
+
+    environment:
+      - OVERRIDE_VIDEO_OUTPUT_DIR=/c/Users/Morfys/.aerokube/selenoid/video
+      - DOCKER_API_VERSION=1.24
+    command: >
+      -conf etc/selenoid/browser.json
+      -video-output-dir /opt/selenoid/video/
+      -video-recorder-image selenoid/video-recorder:latest-release
+      -log-output-dir /opt/selenoid/logs/
+      -container-network selenoid
+      -listen :4444
+    networks:
+      - selenoid
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: test_runner
+    depends_on:
+      - selenoid
+    volumes:
+      - ./target:/usr/src/app/target
+      - maven-cache:/root/.m2
+      - ./tests:/app/tests
+    environment:
+      - MAVEN_OPTS=-Xmx2g
+    command: mvn clean test -Dsurefire.reportFormat=brief
+    networks:
+      - selenoid
+
+volumes:
+  maven-cache:
+    driver: local
+
+networks:
+  selenoid:
+    external: true
+    name: selenoid
