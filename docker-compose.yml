@@ -1,32 +1,35 @@
 services:
-  selenoid:
-    image: aerokube/selenoid:latest-release
-    container_name: selenoid
-    ports:
-      - "4444:4444"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./selenoid/browser.json:/etc/selenoid/browser.json:ro
-    environment:
-      - OVERRIDE_VIDEO_OUTPUT_DIR=/tmp/video
-    command: [ "-conf", "/etc/selenoid/browser.json", "-video-output-dir", "/tmp/video", "-limit", "10" ]
-    healthcheck:
-      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4444/status" ]
-      interval: 5s
-      timeout: 10s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - test-network
+  version: '3'
+  services:
+    selenoid:
+      image: "aerokube/selenoid"
+      network_mode: bridge
+      ports:
+        - "4444:4444"
+      volumes:
+        - "$PWD:/etc/selenoid/" # assumed current dir contains browsers.json
+        - "/var/run/docker.sock:/var/run/docker.sock"
+    selenoid-ui:
+      image: "aerokube/selenoid-ui"
+      network_mode: bridge
+      links:
+        - selenoid
+      ports:
+        - "8081:8081"
+      command: [ "--selenoid-uri", "http://selenoid:4444" ]
+
   test-runner:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: test_runner
+    depends_on:
+      selenoid:
+        condition: service_healthy
     volumes:
       - ./target:/usr/src/app/target
       - maven-cache:/root/.m2
-      - ./tests:/app/tests  # папка с тестами, если нужно
+      - ./tests:/app/tests
     environment:
       - MAVEN_OPTS=-Xmx2g
     command: mvn test -Dsurefire.reportFormat=brief
