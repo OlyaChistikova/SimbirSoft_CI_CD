@@ -38,10 +38,9 @@ services:
       - ./tests:/app/tests
     environment:
       - MAVEN_OPTS=-Xmx2g
-    command: mvn clean test -Dsurefire.reportFormat=brief
     networks:
       - selenoid
-    command: /app/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn test
+    command: /app/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn clean test -Dsurefire.reportFormat=brief
 
 volumes:
   maven-cache:
