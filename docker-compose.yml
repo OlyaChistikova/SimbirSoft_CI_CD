@@ -1,19 +1,23 @@
 services:
   selenoid:
-    container_name: selenoid
-    network_mode: bridge
     image: aerokube/selenoid:latest-release
-    volumes:
-      - ./selenoid/browser.json:/etc/selenoid/browser.json
-      - "/path/to/config:/etc/selenoid"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/path/to/config/video:/opt/selenoid/video"
-      - "/path/to/config/logs:/opt/selenoid/logs"
-    environment:
-      - OVERRIDE_VIDEO_OUTPUT_DIR=/path/to/config/video
-    command: [ "-conf", "/etc/selenoid/browser.json", "-video-output-dir", "/opt/selenoid/video", "-log-output-dir", "/opt/selenoid/logs" ]
+    container_name: selenoid
     ports:
       - "4444:4444"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./selenoid/browser.json:/etc/selenoid/browser.json:ro
+    environment:
+      - OVERRIDE_VIDEO_OUTPUT_DIR=/tmp/video
+    command: [ "-conf", "/etc/selenoid/browser.json", "-video-output-dir", "/tmp/video", "-limit", "10" ]
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4444/status" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - test-network
   test-runner:
     build:
       context: .
