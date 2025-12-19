@@ -9,6 +9,11 @@ COPY pom.xml .
 # Установка зависимостей
 RUN mvn dependency:go-offline -B
 
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 ENV ALLURE_VERSION=2.22.0
 
 RUN mkdir -p /opt/allure \
