@@ -40,8 +40,9 @@ services:
       - MAVEN_OPTS=-Xmx2g
     networks:
       - selenoid
-    command: sh -c "sed -i 's/\r$$//' /app/wait-for-it.sh && /app/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn clean test -Dsurefire.reportFormat=brief
-
+    command: >
+          sh -c "sed -i 's/\r$$//' /app/wait-for-it.sh && 
+          /app/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn clean test -Dsurefire.reportFormat=brief"
 volumes:
   maven-cache:
     driver: local
