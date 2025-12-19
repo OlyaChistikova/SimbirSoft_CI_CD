@@ -66,7 +66,7 @@ pipeline {
         stage('Publish Allure Report') {
             steps {
                 allure([
-                    results: 'target/allure-results',
+                    results: ['target/allure-results'],
                     report: 'target/allure-report'
                 ])
             }
