@@ -106,6 +106,14 @@
         <groupId>io.qameta.allure</groupId>
         <artifactId>allure-maven</artifactId>
         <version>2.10.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>serve</goal>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <reportVersion>${allure.version}</reportVersion>
           <allureDownloadUrl>https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/${allure.version}/allure-commandline-${allure.version}.zip</allureDownloadUrl>
