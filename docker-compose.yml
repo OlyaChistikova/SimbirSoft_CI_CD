@@ -24,7 +24,7 @@ services:
       - ./tests:/app/tests  # папка с тестами, если нужно
     environment:
       - MAVEN_OPTS=-Xmx2g
-    command: mvn clean test -Dsurefire.reportFormat=brief
+    command: mvn test -Dsurefire.reportFormat=brief
     networks:
       - test-network
 volumes:
