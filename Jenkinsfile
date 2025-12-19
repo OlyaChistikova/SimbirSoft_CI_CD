@@ -92,7 +92,7 @@ pipeline {
                         </html>
                     """,
                     mimeType: "text/html",
-                    to: "kjkj.vikipediya@gmail.com"
+                    to: "olyakondr1@yandex.ru"
                 )
             }
         }
