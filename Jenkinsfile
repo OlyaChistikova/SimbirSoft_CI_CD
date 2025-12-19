@@ -20,6 +20,16 @@ pipeline {
             }
         }
 
+        stage('Pull Dependencies') {
+            steps {
+                script {
+                    echo 'Скачивание образов браузеров для Selenoid...'
+                    bat 'docker pull selenoid/vnc:chrome_128.0 || echo "Failed to pull chrome"'
+                    bat 'docker pull selenoid/video-recorder:latest-release || echo "Failed to pull video-recorder"'
+                }
+            }
+        }
+
         stage('Build and Test') {
             steps {
                 script {
@@ -27,6 +37,11 @@ pipeline {
                     bat 'docker-compose down -v --remove-orphans || echo "No containers to stop"'
                     bat 'ping -n 11 127.0.0.1 > nul'
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
+                }
+            }
+            post {
+                always {
+                    bat 'docker logs selenoid'
                 }
             }
         }
