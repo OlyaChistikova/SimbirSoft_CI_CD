@@ -31,7 +31,8 @@ services:
       dockerfile: Dockerfile
     container_name: test_runner
     depends_on:
-      - selenoid
+      selenoid:
+        condition: service_healthy
     volumes:
       - ./target:/usr/src/app/target
       - maven-cache:/root/.m2
