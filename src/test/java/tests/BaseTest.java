@@ -15,8 +15,6 @@ import org.testng.asserts.SoftAssert;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 @Getter
 public class BaseTest {
@@ -26,25 +24,16 @@ public class BaseTest {
 
     @BeforeMethod(description = "Настройка браузера перед запуском тестов")
     public void setUp() throws MalformedURLException {
-        try {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless=new");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--disable-gpu");
-            options.addArguments("--window-size=1920,1080");
-
-            String selenoidUrl = System.getenv("SELENOID_URL");
-
-            if (selenoidUrl == null || selenoidUrl.isEmpty()) {
-                throw new IllegalStateException("SELENOID_URL is not set!");
-            }
-
-            driver = new RemoteWebDriver(new URL(selenoidUrl), options);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+        driver.manage().window().maximize();
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         softAssert = new SoftAssert();
     }
 

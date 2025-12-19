@@ -10,40 +10,27 @@ services:
       - "/path/to/config/logs:/opt/selenoid/logs"
     environment:
       - OVERRIDE_VIDEO_OUTPUT_DIR=/path/to/config/video
-      - DOCKER_API_VERSION=1.24
     command: [ "-conf", "/etc/selenoid/browser.json", "-video-output-dir", "/opt/selenoid/video", "-log-output-dir", "/opt/selenoid/logs" ]
     ports:
       - "4444:4444"
-    healthcheck:
-      test: ["CMD-SHELL", "netstat -an | grep 4444 || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-
   test-runner:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: test_runner
-    depends_on:
-      selenoid:
-        condition: service_healthy
     volumes:
       - ./target:/usr/src/app/target
       - maven-cache:/root/.m2
-      - ./tests:/app/tests
+      - ./tests:/app/tests  # папка с тестами, если нужно
     environment:
       - MAVEN_OPTS=-Xmx2g
-      - SELENIUM_URL=http://172.21.48.1:4444/wd/hub
+    command: mvn clean test -Dsurefire.reportFormat=brief
     networks:
-      - selenoid
-    command: >
-      sh -c "mvn test -Dsurefire.reportFormat=brief"
+      - test-network
 volumes:
   maven-cache:
     driver: local
 
 networks:
-  selenoid:
+  test-network:
     driver: bridge
