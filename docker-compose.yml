@@ -35,7 +35,7 @@ services:
       - ./tests:/app/tests
     environment:
       - MAVEN_OPTS=-Xmx2g
-      - SELENIUM_URL=http://selenoid:4444/wd/hub
+      - SELENIUM_URL=http://172.21.48.1:4444/wd/hub
     networks:
       - selenoid
     command: >
