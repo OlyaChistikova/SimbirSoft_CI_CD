@@ -44,7 +44,6 @@ pipeline {
         stage('Collect Reports') {
             steps {
                 script {
-                    // Проверка, существуют ли отчеты
                     bat 'dir /s target || echo "No target directory"'
                     bat 'dir /s reports || echo "No reports directory"'
                     bat 'dir /s target\\surefire-reports 2>nul || echo "No surefire-reports directory"'
@@ -52,13 +51,9 @@ pipeline {
             }
             post {
                 always {
-                    // Разные возможные пути к отчетам
-                    junit testResults: '**/surefire-reports/*.xml', allowEmptyResults: true
-                    junit testResults: '**/test-results/*.xml', allowEmptyResults: true
-                    junit testResults: '**/reports/*.xml', allowEmptyResults: true
+                    junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
 
-                    archiveArtifacts artifacts: '**/target/**/*', allowEmptyArchive: true
-                    archiveArtifacts artifacts: '**/reports/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
 
                     publishHTML([
                         allowMissing: true,
