@@ -15,6 +15,8 @@ import org.testng.asserts.SoftAssert;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter
 public class BaseTest {
@@ -25,13 +27,29 @@ public class BaseTest {
     @BeforeMethod(description = "Настройка браузера перед запуском тестов")
     public void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--window-size=1920,1080");
 
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+        options.setCapability("selenoid:options", new HashMap<String, Object>() {{
+            /* How to add test badge */
+            put("name", "Test badge...");
+
+            /* How to set session timeout */
+            put("sessionTimeout", "15m");
+
+            /* How to set timezone */
+            put("env", new ArrayList<String>() {{
+                add("TZ=UTC");
+            }});
+
+            /* How to add "trash" button */
+            put("labels", new HashMap<String, Object>() {{
+                put("manual", "true");
+            }});
+
+            /* How to enable video recording */
+            put("enableVideo", true);
+        }});
+        String remoteUrl = System.getenv("SELENIUM_URL");
+        driver = new RemoteWebDriver(new URL(remoteUrl), options);
         driver.manage().window().maximize();
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
