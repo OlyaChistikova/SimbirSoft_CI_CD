@@ -60,6 +60,7 @@ pipeline {
         }
         stage('Generate Allure Report') {
                     steps {
+                        sh 'mvn allure:install'
                         sh 'mvn allure:report'
                     }
                 }
