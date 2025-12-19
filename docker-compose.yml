@@ -1,5 +1,6 @@
 services:
   selenoid:
+    container_name: selenoid
     network_mode: bridge
     image: aerokube/selenoid:latest-release
     volumes:
