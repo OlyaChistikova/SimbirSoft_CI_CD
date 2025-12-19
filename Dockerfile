@@ -1,16 +1,16 @@
 # Используем официальный образ OpenJDK с Maven
 FROM maven:3.8.5-openjdk-17
 
-# Создаем рабочую папку
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Копируем файлы проекта в контейнер
-COPY . /app
+# Копирование pom.xml
+COPY pom.xml .
 
-RUN chmod +x wait-for-it.sh
+# Установка зависимостей
+RUN mvn dependency:go-offline -B
 
-# Устанавливаем переменные окружения
-ENV MAVEN_OPTS="-Xmx2g"
+# Копирование исходного кода
+COPY src ./src
 
-# Команда по умолчанию — запуск тестов
-CMD ["mvn", "clean", "test"]
+# Запуск тестов напрямую
+CMD ["mvn", "test"]

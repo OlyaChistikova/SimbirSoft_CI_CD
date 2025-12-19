@@ -1,5 +1,5 @@
 pipeline {
-     agent any
+    agent any
 
     triggers {
         pollSCM('* * * * *')
@@ -23,9 +23,10 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                      bat 'docker-compose rm -fsva || echo "No previous containers to remove"' 
-            
-                      bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
+
+                    bat 'docker-compose down || echo "No containers to stop"'
+
+                    bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
         }
@@ -92,7 +93,7 @@ pipeline {
                         </html>
                     """,
                     mimeType: "text/html",
-                    to: "kjkj.vikipediya@gmail.com"
+                    to: "olyakondr1@yandex.ru"
                 )
             }
         }
