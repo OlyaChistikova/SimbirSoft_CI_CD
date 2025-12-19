@@ -48,7 +48,8 @@ public class BaseTest {
             /* How to enable video recording */
             put("enableVideo", true);
         }});
-        String remoteUrl = System.getenv("SELENIUM_URL");
+//        String remoteUrl = System.getenv("SELENIUM_URL");
+        String remoteUrl = ("http://172.21.48.1:8080");
         driver = new RemoteWebDriver(new URL(remoteUrl), options);
         driver.manage().window().maximize();
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
