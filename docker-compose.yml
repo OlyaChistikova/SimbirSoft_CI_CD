@@ -11,7 +11,12 @@ services:
         - "./selenoid/logs:/opt/selenoid/logs:Z"
         - "/var/run/docker.sock:/var/run/docker.sock"
         - ./selenoid/browser.json:/etc/selenoid/browser.json:ro
-
+    healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+          start_period: 10s
     environment:
       - OVERRIDE_VIDEO_OUTPUT_DIR=/c/Users/Morfys/.aerokube/selenoid/video
       - DOCKER_API_VERSION=1.24
