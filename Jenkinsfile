@@ -25,7 +25,7 @@ pipeline {
                 script {
 
                     bat 'docker-compose down || echo "No containers to stop"'
-                    bat 'timeout /t 10'
+                    bat 'ping -n 11 127.0.0.1 > nul'
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
