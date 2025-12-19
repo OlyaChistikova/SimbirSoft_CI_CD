@@ -41,6 +41,7 @@ services:
     command: mvn clean test -Dsurefire.reportFormat=brief
     networks:
       - selenoid
+    command: /app/wait-for-it.sh selenoid:4444 --timeout=60 -- mvn test
 
 volumes:
   maven-cache:

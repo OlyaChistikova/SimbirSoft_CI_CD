@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'butler'
-    }
+     agent any
 
     triggers {
         pollSCM('* * * * *')
@@ -25,10 +23,9 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-
-                    bat 'docker-compose down || echo "No containers to stop"'
-
-                    bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
+                      bat 'docker-compose rm -fsva || echo "No previous containers to remove"' 
+            
+                      bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
         }
@@ -69,7 +66,7 @@ pipeline {
         always {
             script {
                 bat 'docker-compose down --remove-orphans --volumes || echo "Cleanup completed"'
-                bat 'docker rm -f api-test-runner selenoid || echo "Containers already removed"'
+                bat 'docker rm -f test-runner selenoid || echo "Containers already removed"'
 
                 // Собираем информацию о тестах для email
                 def testResult = currentBuild.currentResult
@@ -95,7 +92,7 @@ pipeline {
                         </html>
                     """,
                     mimeType: "text/html",
-                    to: "banderlog.cumberbatch@gmail.com"
+                    to: "kjkj.vikipediya@gmail.com"
                 )
             }
         }
