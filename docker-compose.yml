@@ -11,7 +11,12 @@ services:
         - "./selenoid/logs:/opt/selenoid/logs:Z"
         - "/var/run/docker.sock:/var/run/docker.sock"
         - ./selenoid/browser.json:/etc/selenoid/browser.json:ro
-
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -an | grep 4444 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     environment:
       - OVERRIDE_VIDEO_OUTPUT_DIR=/c/Users/Morfys/.aerokube/selenoid/video
       - DOCKER_API_VERSION=1.24
@@ -31,7 +36,8 @@ services:
       dockerfile: Dockerfile
     container_name: test_runner
     depends_on:
-      - selenoid
+      selenoid:
+        condition: service_healthy
     volumes:
       - ./target:/usr/src/app/target
       - maven-cache:/root/.m2
@@ -42,12 +48,11 @@ services:
     networks:
       - selenoid
     command: >
-      sh -c "mvn clean test -Dsurefire.reportFormat=brief"
+      sh -c "mvn test -Dsurefire.reportFormat=brief"
 volumes:
   maven-cache:
     driver: local
 
 networks:
   selenoid:
-    external: true
-    name: selenoid
+    driver: bridge
