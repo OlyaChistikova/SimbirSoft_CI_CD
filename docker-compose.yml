@@ -41,7 +41,7 @@ services:
     networks:
       - selenoid
     command: >
-      sh -c "mvn clean test -Dsurefire.reportFormat=brief"
+      sh -c "mvn test -Dsurefire.reportFormat=brief"
 volumes:
   maven-cache:
     driver: local
