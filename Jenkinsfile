@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                     bat 'dir /s target || echo "No target directory"'
-                    bat 'dir /s reports || echo "No reports directory"'
+
                     bat 'dir /s target\\surefire-reports 2>nul || echo "No surefire-reports directory"'
                 }
             }
