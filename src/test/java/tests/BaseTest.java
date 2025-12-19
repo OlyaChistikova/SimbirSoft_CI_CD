@@ -25,7 +25,6 @@ public class BaseTest {
     @BeforeMethod(description = "Настройка браузера перед запуском тестов")
     public void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
