@@ -39,11 +39,6 @@ pipeline {
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
-            post {
-                always {
-                    bat 'docker logs selenoid'
-                }
-            }
         }
 
         stage('Collect Reports') {
