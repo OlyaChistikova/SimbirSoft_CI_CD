@@ -64,6 +64,17 @@ pipeline {
                         reportName: 'Test Report'
                     ])
                 }
+                always {
+                    // Генерация красивого Allure отчета из папки результатов
+                    script {
+                        allure includeProperties: false,
+                               jdk: '',
+                               results: [[path: 'allure-results']]
+                    }
+
+                    // JUnit отчеты (оставляем для графиков Jenkins)
+                    junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+                }
             }
         }
     }
