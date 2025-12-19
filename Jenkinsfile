@@ -25,7 +25,7 @@ pipeline {
                 script {
 
                     bat 'docker-compose down || echo "No containers to stop"'
-                    bat 'timeout /t 10' // Пауза 10 секунд для Windows
+                    bat 'timeout /t 10'
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
