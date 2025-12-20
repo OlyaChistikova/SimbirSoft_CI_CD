@@ -53,7 +53,20 @@ pipeline {
                 always {
                     junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
 
+                    // Генерация и публикация Allure
+                    allure([
+                        results: ['target/allure-results'],
+                        report: 'target/allure-report'
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'target/allure-results']]
+                    ])
+
+                    // Архивация всех артефактов (логи, скриншоты)
                     archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
+
                  }
             }
         }
