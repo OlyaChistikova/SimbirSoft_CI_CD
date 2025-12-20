@@ -1,8 +1,10 @@
 pipeline {
     agent any
+
     triggers {
         pollSCM('* * * * *')
     }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,21 +12,23 @@ pipeline {
                 bat 'git submodule update --init --recursive'
             }
         }
+
         stage('Verify Tools') {
             steps {
                 bat 'docker --version'
                 bat 'docker-compose --version'
             }
         }
+
         stage('Pull Dependencies') {
             steps {
                 script {
-                    echo 'Скачивание образов браузеров для Selenoid...'
-                    bat 'docker pull selenoid/chrome:latest || echo "Failed to pull chrome"'
+                    bat 'docker pull selenoid/vnc:chrome_128.0 || echo "Failed to pull chrome"'
                     bat 'docker pull selenoid/video-recorder:latest-release || echo "Failed to pull video-recorder"'
                 }
             }
         }
+
         stage('Build and Test') {
             steps {
                 script {
@@ -35,31 +39,27 @@ pipeline {
                 }
             }
         }
+
         stage('Collect Reports') {
             steps {
                 script {
                     bat 'dir /s target || echo "No target directory"'
+
                     bat 'dir /s target\\surefire-reports 2>nul || echo "No surefire-reports directory"'
                 }
             }
             post {
                 always {
                     junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+
                     archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
-                }
-            }
-        }
-        stage('Generate Allure Report') {
-                    steps {
-                        sh 'mvn allure:report'
+
+                script {
+                    allure includeProperties: false,
+                           jdk: '',
+                           results: [[path: 'allure-results']]
                     }
                 }
-        stage('Publish Allure Report') {
-            steps {
-                allure([
-                    results: ['target/allure-results'],
-                    report: 'target/allure-report'
-                ])
             }
         }
     }
