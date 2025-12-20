@@ -29,8 +29,7 @@ public class BaseTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub/"), options);
-        driver.manage().window().maximize();
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub/"), options);        driver.manage().window().maximize();
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         softAssert = new SoftAssert();

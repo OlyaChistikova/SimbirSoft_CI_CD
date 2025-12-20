@@ -14,7 +14,7 @@ services:
     ports:
       - "4444:4444"
     healthcheck:
-      test: ["CMD-SHELL", "netstat -an | grep 4444 || exit 1"]
+      test: [ "CMD-SHELL", "netstat -an | grep 4444 || exit 1" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
     volumes:
       - ./target:/usr/src/app/target
       - maven-cache:/root/.m2
-      - ./tests:/app/tests
+      - ./tests:/app/src/tests
     environment:
       - MAVEN_OPTS=-Xmx2g
     network_mode: bridge
