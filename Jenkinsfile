@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     echo 'Скачивание образов браузеров для Selenoid...'
-                    bat 'docker pull selenoid/vnc:chrome_128.0 || echo "Failed to pull chrome"'
+                    bat 'docker pull selenoid/chrome:latest || echo "Failed to pull chrome"'
                     bat 'docker pull selenoid/video-recorder:latest-release || echo "Failed to pull video-recorder"'
                 }
             }
