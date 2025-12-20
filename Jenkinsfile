@@ -60,8 +60,8 @@ pipeline {
         }
         stage('Generate Allure Report') {
                     steps {
-                        sh 'mvn allure:install'
-                        sh 'mvn allure:report'
+                        bat 'mvn allure:install'
+                        bat 'mvn allure:report'
                     }
                 }
         stage('Publish Allure Report') {
