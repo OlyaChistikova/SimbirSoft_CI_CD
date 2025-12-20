@@ -23,7 +23,6 @@ pipeline {
         stage('Pull Dependencies') {
             steps {
                 script {
-                    bat 'docker pull selenoid/vnc:chrome_128.0 || echo "Failed to pull chrome"'
                     bat 'docker pull selenoid/video-recorder:latest-release || echo "Failed to pull video-recorder"'
                 }
             }
