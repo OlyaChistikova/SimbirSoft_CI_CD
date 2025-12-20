@@ -5,28 +5,26 @@ pipeline {
         pollSCM('* * * * *')
     }
 
-    options {
-        timeout(time: 15, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
-
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                // На Windows используем bat
                 bat 'git submodule update --init --recursive'
             }
         }
 
-        stage('Verify & Pull') {
+        stage('Verify Tools') {
+            steps {
+                bat 'docker --version'
+                bat 'docker-compose --version'
+            }
+        }
+
+        stage('Pull Dependencies') {
             steps {
                 script {
-                    bat 'docker --version'
-                    bat 'docker-compose --version'
-                    echo 'Загрузка образов браузеров...'
-                    bat 'docker pull selenoid/vnc:chrome_128.0'
-                    bat 'docker pull selenoid/video-recorder:latest-release'
+                    bat 'docker pull selenoid/vnc:chrome_128.0 || echo "Failed to pull chrome"'
+                    bat 'docker pull selenoid/video-recorder:latest-release || echo "Failed to pull video-recorder"'
                 }
             }
         }
@@ -34,57 +32,44 @@ pipeline {
         stage('Build and Test') {
             steps {
                 script {
-                    echo 'Очистка старых контейнеров...'
-                    bat 'docker-compose down -v --remove-orphans'
+                    bat 'docker rm -f test_runner || echo "No container to remove"'
 
-                    echo 'Запуск инфраструктуры...'
-                    // Запускаем всё в фоне, кроме тестов
-                    bat 'docker-compose up -d selenoid selenoid-ui'
-
-                    echo 'Ожидание готовности Selenoid (порт 4444)...'
-                    // Динамическая проверка порта вместо ping
-                    bat 'powershell -Command "for($i=0; $i -lt 30; $i++) { if(Test-NetConnection localhost -Port 4444) { exit 0 }; Start-Sleep -Seconds 1 }; exit 1"'
-
-                    echo 'Запуск тестов...'
-                    // Запускаем тесты. Если они упадут, Jenkins пометит стадию как FAILURE
+                    bat 'docker-compose down -v --remove-orphans || echo "No containers to stop"'
+                    bat 'ping -n 11 127.0.0.1 > nul'
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
                 }
             }
         }
 
-        stage('Collect Results') {
+        stage('Collect Reports') {
             steps {
                 script {
-                    // Копируем результаты из контейнера, если они не проброшены через volume
-                    // bat 'docker cp test_runner:/usr/src/app/target ./target'
-                    bat 'dir /s target\\surefire-reports || echo "Reports not found"'
+                    bat 'dir /s target || echo "No target directory"'
+
+                    bat 'dir /s target\\surefire-reports 2>nul || echo "No surefire-reports directory"'
                 }
             }
-        }
-    }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
 
-    post {
-        always {
-            script {
-                // Публикация результатов тестов (JUnit)
-                junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
-
-                // Генерация и публикация Allure
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'target/allure-results']]
-                ])
-
-                // Архивация всех артефактов (логи, скриншоты)
-                archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
+                 }
             }
         }
-        cleanup {
-            echo 'Остановка всех контейнеров проекта...'
-            bat 'docker-compose down -v'
+        stage('Generate Allure Report') {
+            steps {
+                sh 'mvn allure:install'
+                sh 'mvn allure:report'
+            }
+        }
+        stage('Publish Allure Report') {
+            steps {
+                allure([
+                    results: ['target/allure-results'],
+                    report: 'target/allure-report'
+                ])
+            }
         }
     }
 }
