@@ -55,12 +55,20 @@ pipeline {
 
                     archiveArtifacts artifacts: 'target/**/*', allowEmptyArchive: true
 
-                script {
-                    allure includeProperties: false,
-                           jdk: '',
-                           results: [[path: 'allure-results']]
-                    }
-                }
+            }
+        }
+        stage('Generate Allure Report') {
+            steps {
+                sh 'mvn allure:install'
+                sh 'mvn allure:report'
+            }
+        }
+        stage('Publish Allure Report') {
+            steps {
+                allure([
+                    results: ['target/allure-results'],
+                    report: 'target/allure-report'
+                ])
             }
         }
     }
