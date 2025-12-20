@@ -38,13 +38,7 @@ pipeline {
                     bat 'ping -n 11 127.0.0.1 > nul'
                     bat 'docker-compose up --build --abort-on-container-exit --exit-code-from test-runner test-runner'
 
-                    bat 'docker run --rm -d --name test-runner
-                        -v "%CD%":/app
-                        -v "C:\\path\\to\\maven_cache":/root/.m2
-                        -v "%CD%\\target":/app/target
-                        -w /app
-                        maven:3.8.5-openjdk-17
-                        mvn clean test allure:report'
+                    bat 'docker run --rm -d --name test-runner -v "%CD%":/app -v "C:\\path\\to\\maven_cache":/root/.m2 -v "%CD%\\target":/app/target -w /app maven:3.8.5-openjdk-17 mvn clean test allure:report'
                 }
             }
         }
